@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Shopkeeper Dashboard - DRDS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; }
+
+        .topbar {
+            background: linear-gradient(to right, #134e5e, #71b280);
+            color: white;
+            padding: 0 30px;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .topbar h4 { margin: 0; font-weight: 700; font-size: 20px; }
+        .topbar .welcome { font-size: 13px; opacity: 0.85; }
+
+        .stock-card {
+            border-radius: 16px;
+            padding: 25px 20px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transition: transform 0.2s;
+        }
+        .stock-card:hover { transform: translateY(-4px); }
+        .stock-card .icon { font-size: 36px; margin-bottom: 8px; }
+        .stock-card h2 { font-size: 42px; font-weight: 800; margin: 0; }
+        .stock-card p { margin: 4px 0 0; opacity: 0.9; font-size: 14px; font-weight: 500; }
+        .stock-card .unit { font-size: 16px; font-weight: 400; }
+
+        .action-card {
+            border-radius: 16px;
+            padding: 28px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .action-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.2); color: white; }
+        .action-card .icon { font-size: 32px; display: block; margin-bottom: 10px; }
+        .action-card span { display: block; font-size: 13px; opacity: 0.9; margin-top: 4px; }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #888;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div>
+        <h4>🏪 Shopkeeper Dashboard</h4>
+        <div class="welcome">Digital Ration Distribution System</div>
+    </div>
+    <div class="d-flex align-items: center gap-3">
+        <span class="welcome me-3">👋 Welcome, Shopkeeper</span>
+        <a href="{% url 'logout' %}" class="btn btn-danger btn-sm px-3">🚪 Logout</a>
+    </div>
+</div>
+
+<div class="container-fluid px-4 mt-4">
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-warning alert-dismissible fade show">
+                ⚠️ {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- STOCK SECTION -->
+    <p class="section-title">📦 Current Stock</p>
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="stock-card" style="background: linear-gradient(135deg,#56ab2f,#a8e063);">
+                <div class="icon">🌾</div>
+                <h2>{{ rice.quantity|default:"0" }}<span class="unit"> kg</span></h2>
+                <p>Rice Available</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stock-card" style="background: linear-gradient(135deg,#f7971e,#ffd200);">
+                <div class="icon">🌾</div>
+                <h2>{{ wheat.quantity|default:"0" }}<span class="unit"> kg</span></h2>
+                <p>Wheat Available</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stock-card" style="background: linear-gradient(135deg,#eb3349,#f45c43);">
+                <div class="icon">🍬</div>
+                <h2>{{ sugar.quantity|default:"0" }}<span class="unit"> kg</span></h2>
+                <p>Sugar Available</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACTIONS SECTION -->
+    <p class="section-title">⚡ Quick Actions</p>
+    <div class="row g-3">
+        <div class="col-md-2 col-6">
+            <a href="{% url 'send_otp' %}" class="action-card" style="background: linear-gradient(135deg,#f7971e,#ffd200);">
+                <i class="icon">📤</i>
+                Send OTP
+                <span>Generate & send OTP</span>
+            </a>
+        </div>
+        <div class="col-md-2 col-6">
+            <a href="{% url 'verify_otp' %}" class="action-card" style="background: linear-gradient(135deg,#4facfe,#00f2fe);">
+                <i class="icon">🔐</i>
+                Verify OTP
+                <span>Verify user OTP</span>
+            </a>
+        </div>
+        <div class="col-md-2 col-6">
+            <a href="{% url 'distribute_ration' %}" class="action-card" style="background: linear-gradient(135deg,#56ab2f,#a8e063);">
+                <i class="icon">🍚</i>
+                Distribute
+                <span>Distribute ration</span>
+            </a>
+        </div>
+        <div class="col-md-2 col-6">
+            <a href="{% url 'add_user' %}" class="action-card" style="background: linear-gradient(135deg,#667eea,#764ba2);">
+                <i class="icon">👤</i>
+                Manage Users
+                <span>Add / edit users</span>
+            </a>
+        </div>
+        <div class="col-md-2 col-6">
+            <a href="{% url 'user_history' %}" class="action-card" style="background: linear-gradient(135deg,#134e5e,#71b280);">
+                <i class="icon">📋</i>
+                History
+                <span>View distribution</span>
+            </a>
+        </div>
+        <div class="col-md-2 col-6">
+            <a href="{% url 'transparency' %}" class="action-card" style="background: linear-gradient(135deg,#1a1a2e,#16213e);">
+                <i class="icon">📊</i>
+                Transparency
+                <span>All records</span>
+            </a>
+        </div>
+    </div>
+
+</div>
+
+<footer class="text-center mt-5 mb-3 text-muted" style="font-size: 12px;">
+    © 2026 Digital Ration Distribution System | Government of India
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

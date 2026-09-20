@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Digital Ration System</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+                        url('https://images.unsplash.com/photo-1606787366850-de6330128bfc');
+            background-size: cover;
+            background-position: center;
+            color: white;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        .header p {
+            opacity: 0.8;
+            font-size: 14px;
+        }
+
+        .container-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+            gap: 80px;
+            padding: 20px;
+        }
+
+        .about {
+            max-width: 500px;
+        }
+
+        .about h2 {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        .login-box {
+            width: 380px;
+            padding: 35px;
+            border-radius: 15px;
+            backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        .login-box h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: none;
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(to right, #0072ff, #00c6ff);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .login-box button:hover {
+            transform: scale(1.05);
+        }
+
+        .error {
+            color: #ff4d4d;
+            text-align: center;
+        }
+
+        .footer-text {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 10px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <div class="header">
+        <p>IN GOVERNMENT OF INDIA | PUBLIC DISTRIBUTION SYSTEM</p>
+        <h1>Digital Ration Distribution System (DRDS)</h1>
+        <p>Ingle Square, Wardha</p>
+    </div>
+
+    <!-- MAIN -->
+    <div class="container-box">
+
+        <!-- ABOUT -->
+        <div class="about">
+            <h2>About DRDS</h2>
+            <p>
+                The Digital Ration Distribution System (DRDS) ensures transparency,
+                efficiency, and accountability in ration distribution.
+            </p>
+            <p>
+                Track stock updates, distribution history, and ensure fair delivery
+                of essential commodities like rice, wheat, and sugar.
+            </p>
+        </div>
+
+        <!-- LOGIN -->
+        <div class="login-box">
+            <h2>Login</h2>
+
+            <!-- ERROR MESSAGE -->
+            {% if error %}
+                <p class="error">{{ error }}</p>
+            {% endif %}
+
+            <!-- FORM -->
+            <form method="POST">
+                {% csrf_token %}
+
+                <input type="text" name="username" placeholder="Enter Mobile Number" required>
+                <input type="password" name="password" placeholder="Enter Password" required>
+
+                <button type="submit">Login</button>
+            </form>
+
+            <p class="footer-text">
+                © Government of India | Secure Login
+            </p>
+        </div>
+    </div>
+</body>
+</html>

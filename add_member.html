@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Family Members</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container mt-4">
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} text-center">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row g-4">
+
+        <!-- ADD MEMBER FORM -->
+        <div class="col-md-5">
+            <div class="card shadow p-4">
+                <div class="text-center mb-2" style="font-size:40px;">👨‍👩‍👧‍👦</div>
+                <h4 class="text-center mb-3">Add Family Member</h4>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label>Member Name</label>
+                        <input type="text" name="name" class="form-control" placeholder="Enter full name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Age</label>
+                        <input type="number" name="age" class="form-control" placeholder="Enter age" min="0" max="120" required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">➕ Add Member</button>
+                </form>
+
+                <a href="{% url 'user_dashboard' %}" class="btn btn-secondary w-100 mt-2">⬅ Back to Dashboard</a>
+            </div>
+        </div>
+
+        <!-- EXISTING MEMBERS LIST -->
+        <div class="col-md-7">
+            <div class="card shadow p-4">
+                <h4 class="mb-3">👥 Your Family Members</h4>
+
+                {% if members %}
+                <table class="table table-bordered table-hover text-center">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Age</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in members %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ m.name }}</td>
+                            <td>{{ m.age }} yrs</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="alert alert-info text-center mb-0">
+                    Total Members: <strong>{{ members|length }}</strong> &nbsp;|&nbsp;
+                    Rice Allowed: <strong>{{ members|length|add:0 }} × 5 kg</strong> &nbsp;|&nbsp;
+                    Sugar Allowed: <strong>{{ members|length|add:0 }} × 2 kg</strong>
+                </div>
+                {% else %}
+                <div class="text-center text-muted mt-4">
+                    <p style="font-size:50px;">👤</p>
+                    <p>No family members added yet.<br>Add members to increase your ration allowance.</p>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

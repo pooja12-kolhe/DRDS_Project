@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard - DRDS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
+        .topbar { background: linear-gradient(to right, #1a1a2e, #16213e); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+        .topbar h4 { margin: 0; font-weight: 700; letter-spacing: 1px; }
+        .stat-card { border-radius: 12px; padding: 20px; color: white; text-align: center; }
+        .stat-card h2 { font-size: 36px; font-weight: 700; margin: 0; }
+        .stat-card p  { margin: 0; opacity: 0.85; font-size: 14px; }
+        .section-card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+        .table thead { background: #1a1a2e; color: white; }
+        .table tbody tr:hover { background: #f8f9ff; }
+        .nav-tabs .nav-link { color: #1a1a2e; font-weight: 600; }
+        .nav-tabs .nav-link.active { background: #1a1a2e; color: white; border-color: #1a1a2e; }
+        .stock-badge { font-size: 15px; font-weight: 700; padding: 6px 16px; border-radius: 20px; }
+    </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+    <h4>🏛️ DRDS — Admin Dashboard</h4>
+    <div>
+        <a href="{% url 'transparency' %}" class="btn btn-outline-light btn-sm me-2">📊 Transparency</a>
+        <a href="{% url 'user_history' %}" class="btn btn-outline-light btn-sm me-2">📋 History</a>
+        <a href="{% url 'logout' %}" class="btn btn-danger btn-sm">Logout</a>
+    </div>
+</div>
+
+<div class="container-fluid px-4 mt-4">
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show">
+                {{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- STAT CARDS -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card" style="background: linear-gradient(135deg,#667eea,#764ba2);">
+                <h2>{{ users|length }}</h2>
+                <p>👥 Total Users</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="background: linear-gradient(135deg,#56ab2f,#a8e063);">
+                {% for s in stocks %}{% if s.item_name == 'Rice' %}<h2>{{ s.quantity }}</h2>{% endif %}{% endfor %}
+                <p>🌾 Rice Stock (kg)</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="background: linear-gradient(135deg,#f7971e,#ffd200);">
+                {% for s in stocks %}{% if s.item_name == 'Wheat' %}<h2>{{ s.quantity }}</h2>{% endif %}{% endfor %}
+                <p>🌾 Wheat Stock (kg)</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="background: linear-gradient(135deg,#eb3349,#f45c43);">
+                {% for s in stocks %}{% if s.item_name == 'Sugar' %}<h2>{{ s.quantity }}</h2>{% endif %}{% endfor %}
+                <p>🍬 Sugar Stock (kg)</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- LEFT: UPDATE STOCK -->
+        <div class="col-md-3">
+            <div class="section-card">
+                <h5 class="mb-3">📦 Update Stock</h5>
+                <form method="POST" action="{% url 'update_stock' %}">
+                    {% csrf_token %}
+                    <div class="mb-2">
+                        <label class="form-label">Item</label>
+                        <select name="item" class="form-select">
+                            <option>Rice</option>
+                            <option>Wheat</option>
+                            <option>Sugar</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Quantity (kg)</label>
+                        <input type="number" name="quantity" class="form-control" min="1" required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">➕ Add Stock</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- RIGHT: TABS -->
+        <div class="col-md-9">
+            <div class="section-card">
+
+                <!-- TABS -->
+                <ul class="nav nav-tabs mb-3" id="adminTabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#usersTab">👥 Users</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#stockTab">📦 Stock</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#otpTab">🔐 OTP Logs</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+
+                    <!-- USERS TAB -->
+                    <div class="tab-pane fade show active" id="usersTab">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="text-muted">Total: <strong>{{ users|length }}</strong> users</span>
+                            <form method="GET" class="d-flex gap-2">
+                                <input type="text" name="search" placeholder="🔍 Search..." class="form-control form-control-sm" value="{{ request.GET.search }}">
+                                <button class="btn btn-primary btn-sm">Search</button>
+                            </form>
+                        </div>
+                        <table class="table table-hover table-bordered mb-0">
+                            <thead>
+                                <tr><th>#</th><th>Name</th><th>Mobile</th><th>Email</th><th>Ration Card</th><th>Action</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for u in users %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ u.name }}</td>
+                                    <td>{{ u.mobile }}</td>
+                                    <td>{{ u.email|default:"—" }}</td>
+                                    <td>{{ u.ration_card_no }}</td>
+                                    <td>
+                                        <a href="{% url 'edit_user' u.id %}" class="btn btn-warning btn-sm">✏️</a>
+                                        <a href="{% url 'delete_user' u.id %}" class="btn btn-danger btn-sm"
+                                           onclick="return confirm('Delete {{ u.name }}?')">🗑</a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="6" class="text-center text-muted">No users found</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- STOCK TAB -->
+                    <div class="tab-pane fade" id="stockTab">
+                        <table class="table table-hover table-bordered mb-0">
+                            <thead>
+                                <tr><th>Item</th><th>Quantity (kg)</th><th>Available From</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for s in stocks %}
+                                <tr>
+                                    <td><strong>{{ s.item_name }}</strong></td>
+                                    <td>
+                                        <span class="stock-badge {% if s.quantity < 10 %}bg-danger text-white{% elif s.quantity < 50 %}bg-warning{% else %}bg-success text-white{% endif %}">
+                                            {{ s.quantity }} kg
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if s.available_from %}
+                                            {{ s.available_from|date:"d M Y, h:i A" }}
+                                        {% else %}
+                                            <span class="text-muted">—</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="3" class="text-center text-muted">No stock data</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- OTP TAB -->
+                    <div class="tab-pane fade" id="otpTab">
+                        <table class="table table-hover table-bordered mb-0">
+                            <thead>
+                                <tr><th>#</th><th>User</th><th>OTP</th><th>Status</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for o in otps %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ o.user.name }}</td>
+                                    <td><strong>{{ o.otp }}</strong></td>
+                                    <td>
+                                        {% if o.is_verified %}
+                                            <span class="badge bg-success">✅ Verified</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark">⏳ Pending</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="4" class="text-center text-muted">No OTP records</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
